@@ -5,19 +5,12 @@
         <nav-tree></nav-tree>
       </el-col>
       <el-col :span="19" :offset="1">
-        <!-- <nav-tab
-          :editableTabs="editableTabs"
-          :editableTabsValue="editableTabsValue"
-          @add-tab="addTab"
-          @remove-tab="removeTab"
-        >-->
         <nav-tab
           :editableTabs="editableTabs"
           :editableTabsValue="editableTabsValue"
           @remove-tab="removeTab"
-          @handle-editable-tabs-value="handleEditableTabsValue"
+          @change-tab="changeTab"
         ></nav-tab>
-
         <iframe-router-view :componentsArr="componentsArr"></iframe-router-view>
       </el-col>
     </el-row>
@@ -38,8 +31,7 @@ export default {
     return {
       editableTabsValue: "2",
       editableTabs: [],
-      tabIndex: 0,
-      componentsArr: []
+      tabIndex: 0
     };
   },
   created() {
@@ -51,18 +43,36 @@ export default {
       next();
     });
   },
+  computed: {
+    componentsArr() {
+      return this.editableTabs.filter(item => {
+        return item.chain === "2";
+      });
+    }
+  },
   methods: {
-    addTab(path, title) {
+    /**
+     * 增加tab
+     * @method addTab
+     * @param {string} path 全路径
+     * @param {string} title tab名称
+     * @param {string} chain 外链 1为内链 2为外链
+     */
+
+    addTab(path, title, chain) {
+      //通过tab名称判断是否重复
       let flag = this.editableTabs.find(item => {
         return item.title === title;
       });
       let newTabName = "";
+      //如果存在该tab
       if (!flag) {
         newTabName = ++this.tabIndex + "";
         this.editableTabs.push({
           title,
           name: newTabName,
-          path
+          path,
+          chain
         });
       } else {
         newTabName = flag.name;
@@ -70,11 +80,18 @@ export default {
 
       this.editableTabsValue = newTabName;
     },
+    /**
+     * 删除tab
+     * @method removeTab
+     * @param {string} name tab的id
+     */
     removeTab(name) {
       let tabs = this.editableTabs;
       let activeName = this.editableTabsValue;
-      let lastActiveName = this.editableTabsValue;
       let path = "";
+
+      if(tabs.length<=1) return;
+
       if (activeName === name) {
         tabs.forEach((tab, index) => {
           if (tab.name === name) {
@@ -85,42 +102,30 @@ export default {
             }
           }
         });
+        this.$router.push({ path });
       }
       this.editableTabsValue = activeName;
       this.editableTabs = tabs.filter(tab => tab.name !== name);
-      this.componentsArr = this.componentsArr.filter(tab => tab.name !== name);
-
-      lastActiveName === name &&
-        this.editableTabs.length &&
-        this.$router.push({ path });
     },
-    handleEditableTabsValue(name) {
+    /**
+     * 切换tab
+     * @method changeTab
+     * @param {string} name tab的id
+     */
+    changeTab(name) {
+      //通过id切换tab
       let flag = this.editableTabs.find(item => {
         return item.name === name;
       });
       let { path } = flag;
-      this.$router.push({ path });
       this.editableTabsValue = name;
+      this.$router.push({ path });
     },
+
     mountRoute(oRouter) {
       let { fullPath, query } = oRouter;
-      let { title } = query;
-      this.isAddIframePage(fullPath, title);
-      this.addTab(fullPath, title);
-    },
-    // 判断是否挂载到editableTabs
-    isAddIframePage(path, title, name) {
-      let component = this.$router.getMatchedComponents(path)[0];
-
-      if (!component) {
-        let isComponentRepeat = this.componentsArr.find(item => {
-          return item.path == path;
-        });
-        if (!isComponentRepeat) {
-          let newTabName = ++this.tabIndex + "";
-          this.componentsArr.push({ path, title, name: newTabName });
-        }
-      }
+      let { title, chain } = query;
+      this.addTab(fullPath, title, chain);
     }
   }
 };

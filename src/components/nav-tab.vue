@@ -4,7 +4,7 @@
       <el-button size="small" @click="addTab">add tab</el-button>
     </div> -->
     <!-- <el-tabs v-model="editableTabsValue" type="card" closable @tab-remove="removeTab"> -->
-    <el-tabs :value="editableTabsValue" @tab-click="handleEditableTabsValue" type="card" closable @tab-remove="removeTab">
+    <el-tabs :value="editableTabsValue" @tab-click="changeTab" type="card" closable @tab-remove="removeTab">
       <el-tab-pane
         v-for="(item) in editableTabs"
         :key="item.name"
@@ -26,8 +26,8 @@ export default {
     removeTab(targetName) {
       this.$emit("remove-tab", targetName);
     },
-    handleEditableTabsValue(component){
-      this.$emit('handle-editable-tabs-value',component.name);
+    changeTab(component){
+      this.$emit('change-tab',component.name);
     }
   },
 };
