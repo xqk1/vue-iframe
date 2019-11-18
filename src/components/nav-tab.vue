@@ -1,15 +1,17 @@
 <template>
   <div>
-    <!-- <div style="margin-bottom: 20px;">
-      <el-button size="small" @click="addTab">add tab</el-button>
-    </div> -->
-    <!-- <el-tabs v-model="editableTabsValue" type="card" closable @tab-remove="removeTab"> -->
-    <el-tabs :value="editableTabsValue" @tab-click="changeTab" type="card" closable @tab-remove="removeTab">
+    <el-tabs
+      :value="editableTabsValue"
+      @tab-click="changeTab"
+      @tab-remove="removeTab"
+      class="tabbar"
+    >
       <el-tab-pane
         v-for="(item) in editableTabs"
         :key="item.name"
         :label="item.title"
         :name="item.name"
+        :closable="item.title != '首页'"
       >
         <slot></slot>
       </el-tab-pane>
@@ -20,15 +22,24 @@
 export default {
   props: ["editableTabs", "editableTabsValue"],
   methods: {
-    addTab(targetName) {
-      this.$emit("add-tab", this.editableTabsValue);
-    },
     removeTab(targetName) {
       this.$emit("remove-tab", targetName);
     },
-    changeTab(component){
-      this.$emit('change-tab',component.name);
+    changeTab(component) {
+      this.$emit("change-tab", component.name);
     }
-  },
+  }
 };
 </script> 
+
+<style>
+.tabbar{
+  padding: 0 10px;
+}
+.tabbar .el-tabs__nav-wrap::after{
+  background-color: #fff;
+}
+.tabbar .el-tabs__item{
+  font-size: 12px;
+}
+</style>

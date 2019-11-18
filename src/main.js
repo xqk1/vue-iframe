@@ -1,9 +1,10 @@
 import Vue from "vue/dist/vue.js";
-import App from "./App.vue";
 import VueRouter from "vue-router";
-import F1 from "./components/f1";
-import F2 from "./components/f2";
 import axios from "axios";
+
+import router from "./router";
+
+import App from "./App.vue";
 
 import {
   Pagination,
@@ -171,33 +172,6 @@ Vue.prototype.$message = Message;
 
 Vue.prototype.$http = axios;
 
-const Index = { template: "<div>Index</div>" };
-const routes = [
-  {
-    path: "/",
-    name: "index",
-    component: Index
-  },
-  {
-    path: "/f1",
-    name: "f1",
-    component: F1
-  },
-  {
-    path: "/f2",
-    name: "f2",
-    component: F2
-  },
-  {
-    path: "*"
-  }
-];
-
-const router = new VueRouter({
-  routes, // （缩写）相当于 routes: routes,
-  base: "/boss-web",
-  mode:'history'
-});
 Vue.config.productionTip = false;
 
 Vue.use(VueRouter);
@@ -205,21 +179,3 @@ new Vue({
   render: h => h(App),
   router
 }).$mount("#app");
-
-// this.$http
-//   .get(
-//     "/ifbp-boss-web/getSystemModuleTree?time=1573709482718"
-//   )
-//   .then(res => {
-//     console.log(res);
-//   });
-
-//  <div class="nav">
-//   <router-link class="router" to="/f1">Go to F1</router-link>
-//   <div></div>
-//   <router-link class="router" to="/f2">Go to F2</router-link>
-//   <div></div>
-//   <router-link class="router" to="/index?url=http://www.baidu.com">Go to Index</router-link>
-//   <div></div>
-//   <router-link class="router" to="/indexaaa?url=http://www.qq.com">Go to indexaaa</router-link>
-// </div>

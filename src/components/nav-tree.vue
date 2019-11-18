@@ -14,7 +14,10 @@
       <el-menu-item-group>
         <template slot="title">分组一</template>
         <el-menu-item index="1-1" @click="$emit('route-click')">
-          <router-link class="router" to="/index?iframeUrl=http://www.baidu.com&title=baidu&chain=2">Go to Index</router-link>
+          <router-link
+            class="router"
+            to="/index?iframeUrl=http://www.baidu.com&title=baidu&chain=2"
+          >Go to Index</router-link>
         </el-menu-item>
         <el-menu-item index="1-2">
           <router-link class="router" to="/f1?title=f1&chain=1">Go to F1</router-link>
@@ -25,7 +28,10 @@
           <router-link class="router" to="/f2?title=f2&chain=1">Go to F2</router-link>
         </el-menu-item>
         <el-menu-item index="1-5">
-          <router-link class="router" to="/indexaaa?iframeUrl=http://www.qq.com&title=qq&chain=2">Go to indexaaa</router-link>
+          <router-link
+            class="router"
+            to="/indexaaa?iframeUrl=http://www.qq.com&title=qq&chain=2"
+          >Go to indexaaa</router-link>
         </el-menu-item>
       </el-menu-item-group>
       <el-submenu index="1-4">
@@ -50,17 +56,13 @@
 
 <script>
 export default {
-  data(){
-    return{
-    }
+  data() {
+    return {};
   },
   methods: {
-    handleOpen(key, keyPath) {
-    },
-    handleClose(key, keyPath) {
-    },
-    handleSelect(key, keyPath) {
-    }
+    handleOpen(key, keyPath) {},
+    handleClose(key, keyPath) {},
+    handleSelect(key, keyPath) {}
   }
 };
 </script>

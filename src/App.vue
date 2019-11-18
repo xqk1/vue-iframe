@@ -1,16 +1,18 @@
 <template>
   <div id="app">
+    <el-row>
+      <nav-tab
+        :editableTabs="editableTabs"
+        :editableTabsValue="editableTabsValue"
+        @remove-tab="removeTab"
+        @change-tab="changeTab"
+      ></nav-tab>
+    </el-row>
     <el-row class="tac">
       <el-col :span="4">
         <nav-tree></nav-tree>
       </el-col>
       <el-col :span="19" :offset="1">
-        <nav-tab
-          :editableTabs="editableTabs"
-          :editableTabsValue="editableTabsValue"
-          @remove-tab="removeTab"
-          @change-tab="changeTab"
-        ></nav-tab>
         <iframe-router-view :componentsArr="componentsArr"></iframe-router-view>
       </el-col>
     </el-row>
@@ -30,11 +32,23 @@ export default {
   data() {
     return {
       editableTabsValue: "2",
-      editableTabs: [],
-      tabIndex: 0
+      editableTabs: [
+        //默认首页，首页不可关闭
+        {
+          title: "首页",
+          name: "1",
+          path: "/home-page?title=首页&chain=1"
+        }
+      ],
+      tabIndex: 1,
+      data :[]
     };
   },
   created() {
+    //如果当前为首页
+    if (this.$route.path === "/") {
+      this.$router.push("/home-page?title=首页&chain=1");
+    }
     //初次加载，挂载
     this.mountRoute(this.$route);
     //路由切换，动态挂载component
@@ -42,6 +56,10 @@ export default {
       this.mountRoute(to);
       next();
     });
+    //暴露接口
+    window.frameWrapper = {
+      open: this.openRoute.bind(this)
+    };
   },
   computed: {
     componentsArr() {
@@ -90,8 +108,6 @@ export default {
       let activeName = this.editableTabsValue;
       let path = "";
 
-      if(tabs.length<=1) return;
-
       if (activeName === name) {
         tabs.forEach((tab, index) => {
           if (tab.name === name) {
@@ -113,6 +129,10 @@ export default {
      * @param {string} name tab的id
      */
     changeTab(name) {
+      //如果点击active，不切换
+      if (name === this.editableTabsValue) {
+        return false;
+      }
       //通过id切换tab
       let flag = this.editableTabs.find(item => {
         return item.name === name;
@@ -121,12 +141,29 @@ export default {
       this.editableTabsValue = name;
       this.$router.push({ path });
     },
-
-    mountRoute(oRouter) {
-      let { fullPath, query } = oRouter;
+    /**
+     * @method mountRoute
+     * @param {object} oRoute route实例
+     */
+    mountRoute(oRoute) {
+      let { fullPath, query } = oRoute;
       let { title, chain } = query;
       this.addTab(fullPath, title, chain);
+    },
+    /**
+     * @method openRoute
+     * @param {string} path 全路径
+     */
+    openRoute(path) {
+      this.$router.push({ path });
     }
   }
 };
 </script>
+
+<style>
+body{
+  padding: 0;
+  margin: 0;
+}
+</style>
