@@ -22,6 +22,7 @@
 import iframeRouterView from "./components/iframe-router-view";
 import navTree from "./components/nav-tree";
 import navTab from "./components/nav-tab";
+import { mapMutations, mapState } from "vuex";
 export default {
   name: "app",
   components: {
@@ -31,17 +32,7 @@ export default {
   },
   data() {
     return {
-      editableTabsValue: "2",
-      editableTabs: [
-        //默认首页，首页不可关闭
-        {
-          title: "首页",
-          name: "1",
-          path: "/home-page?title=首页&chain=1"
-        }
-      ],
-      tabIndex: 1,
-      data :[]
+      data: []
     };
   },
   created() {
@@ -49,19 +40,13 @@ export default {
     if (this.$route.path === "/") {
       this.$router.push("/home-page?title=首页&chain=1");
     }
-    //初次加载，挂载
-    this.mountRoute(this.$route);
-    //路由切换，动态挂载component
-    this.$router.beforeEach((to, from, next) => {
-      this.mountRoute(to);
-      next();
-    });
     //暴露接口
     window.frameWrapper = {
       open: this.openRoute.bind(this)
     };
   },
   computed: {
+    ...mapState('editableTabs',["editableTabsValue", "editableTabs"]),
     componentsArr() {
       return this.editableTabs.filter(item => {
         return item.chain === "2";
@@ -69,35 +54,7 @@ export default {
     }
   },
   methods: {
-    /**
-     * 增加tab
-     * @method addTab
-     * @param {string} path 全路径
-     * @param {string} title tab名称
-     * @param {string} chain 外链 1为内链 2为外链
-     */
-
-    addTab(path, title, chain) {
-      //通过tab名称判断是否重复
-      let flag = this.editableTabs.find(item => {
-        return item.title === title;
-      });
-      let newTabName = "";
-      //如果存在该tab
-      if (!flag) {
-        newTabName = ++this.tabIndex + "";
-        this.editableTabs.push({
-          title,
-          name: newTabName,
-          path,
-          chain
-        });
-      } else {
-        newTabName = flag.name;
-      }
-
-      this.editableTabsValue = newTabName;
-    },
+    ...mapMutations('editableTabs',["changeEditableTabsValue", "removeEditableTabs"]),
     /**
      * 删除tab
      * @method removeTab
@@ -120,8 +77,8 @@ export default {
         });
         this.$router.push({ path });
       }
-      this.editableTabsValue = activeName;
-      this.editableTabs = tabs.filter(tab => tab.name !== name);
+      this.changeEditableTabsValue(activeName);
+      this.removeEditableTabs(name);
     },
     /**
      * 切换tab
@@ -138,17 +95,8 @@ export default {
         return item.name === name;
       });
       let { path } = flag;
-      this.editableTabsValue = name;
+      this.changeEditableTabsValue(name);
       this.$router.push({ path });
-    },
-    /**
-     * @method mountRoute
-     * @param {object} oRoute route实例
-     */
-    mountRoute(oRoute) {
-      let { fullPath, query } = oRoute;
-      let { title, chain } = query;
-      this.addTab(fullPath, title, chain);
     },
     /**
      * @method openRoute
@@ -162,7 +110,7 @@ export default {
 </script>
 
 <style>
-body{
+body {
   padding: 0;
   margin: 0;
 }
